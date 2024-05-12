@@ -4,7 +4,13 @@
 const int TABLE_SIZE_E = 10;
 const int TABLE_SIZE_P = 2;
 
-void readtable(FILE *file, float subtable[TABLE_SIZE_E][TABLE_SIZE_P]) {
+float *get_table_value(float *table, int i, int j, int k) {
+  int stride_k = TABLE_SIZE_E * TABLE_SIZE_P;
+  int stride_i = TABLE_SIZE_P;
+  return &table[stride_k * k + stride_i * i + j];
+}
+
+void readtable(FILE *file, float *table, int k) {
   char buff[2048];
 
   int i;
@@ -14,11 +20,12 @@ void readtable(FILE *file, float subtable[TABLE_SIZE_E][TABLE_SIZE_P]) {
     if (buff[0]=='#') {
       continue;
     }
-    sscanf(buff, "%f %f", &subtable[i][0], &subtable[i][1]);
-    printf("subtable: %f %f \n", subtable[i][0], subtable[i][1]);
+    sscanf(buff, "%f %f", get_table_value(table, i, 0, k), get_table_value(table, i, 1, k));
+    printf("subtable: %f %f \n", *get_table_value(table, i, 0, k), *get_table_value(table, i, 1, k));
     i++;
   };
 }
+
 
 int main() {
 
@@ -30,18 +37,22 @@ int main() {
 
   int i, j, k, l;
 
+  float *boxed_table = malloc( TABLE_SIZE_E * TABLE_SIZE_P * 2 * sizeof(boxed_table));
+
   file = fopen("example.dat", "r");
   j = 0;
   for (int j=0; (j < 2); j++) {
-    readtable(file, table[j]);
+    readtable(file, boxed_table, j);
   };
 
   k = 4;
   l = 1;
   printf("For k = %d in table %d\n", k, l+1);
-  printf("Energy[k] = %f, Scattering cross-section: %f\n", table[l][k][0], table[l][k][1]);
+  printf("Energy[k] = %f, Scattering cross-section: %f\n", *get_table_value(boxed_table, k, 0, l), 
+    *get_table_value(boxed_table, k, 1, l));
 
 
+  free(boxed_table);
   return 0;
 
 }
