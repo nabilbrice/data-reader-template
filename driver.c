@@ -34,19 +34,30 @@ void load_subtable(float *table, FILE *file, int k) {
   printf("finished loading table %d\n", k);
 }
 
+float *initialise_table(FILE *file) {
+  float *table = malloc(TABLE_DIMS * sizeof(table));
+  if (table == NULL) {
+    printf("Error allocating memory for table");
+    return table;
+  };
+
+  for (int k=0; (k < NUMBER_OF_TABLES); k++) {
+    load_subtable(table, file, k);
+  };
+
+  return table;
+}
+
 
 int main() {
   FILE *file;
   int i, k;
 
-  // the table stored in memory:
-  float *boxed_table = malloc(TABLE_DIMS * sizeof(boxed_table));
-
   file = fopen("example.dat", "r");
-  for (int k=0; (k < NUMBER_OF_TABLES); k++) {
-    load_subtable(boxed_table, file, k);
-  };
+  float *boxed_table = initialise_table(file);
+  fclose(file);
 
+  // test getting some of the table values after initialisation:
   i = 0;
   k = 0;
   printf("For i = %d in table %d\n", i, k+1);
