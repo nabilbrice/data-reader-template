@@ -1,7 +1,7 @@
 #ifndef DRIVER_TABLE_READER_H_
 #define DRIVER_TABLE_READER_H_
 
-#include <stdlib.h>
+#include <stdio.h>
 
 float *get_table_value(float *, int, int, int, int);
 
