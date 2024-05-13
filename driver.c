@@ -21,10 +21,16 @@ void load_subtable(float *table, FILE *file, int k) {
   char buff[1024];
 
   int i = 0;
+  float temperature, density;
   // condition to capture end of file and end of table
   // while loop is needed to bypass the comments
   while (fgets(buff, sizeof(buff), file)&&(i<TABLE_DIM_E)) {
     if (buff[0]=='#') {
+      if (sscanf(buff, "%*s %f %f", &temperature, &density)) {
+        printf("logT = %f and logR = %f\n", temperature, density);
+      } else {
+        printf("skipped commented line\n");
+      };
       continue;
     };
     sscanf(buff, "%f %f", get_table_value(table, 0, i, k), get_table_value(table, 1, i, k));
