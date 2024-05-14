@@ -20,17 +20,18 @@ float *get_table_value(float *table, int p, int i, int j, int k) {
   return &table[stride_k * k + stride_j * j + stride_i * i + p];
 }
 
+// loads a particular 2D table with rows and columns
 void load_subtable(float *table, FILE *file, int j, int k) {
   char buff[1024];
 
   int i = 0;
-  float temperature, density;
+  float value_p0, value_p1;
   // condition to capture end of file and end of table
   // while loop is needed to bypass the comments
   while (fgets(buff, sizeof(buff), file)&&(i<DIM_R)) {
     if (buff[0]=='#') {
-      if (sscanf(buff, "%*s %f %f", &temperature, &density)) {
-        printf("logT = %f and logR = %f\n", temperature, density);
+      if (sscanf(buff, "%*s %f %f", &value_p0, &value_p1)) {
+        printf("logT = %f and logR = %f\n", value_p0, value_p1);
       } else {
         printf("skipped commented line\n");
       };
@@ -43,6 +44,7 @@ void load_subtable(float *table, FILE *file, int j, int k) {
   printf("finished loading table %d\n", DIM_F * k + j + 1);
 }
 
+// requires manually calling free when done with the table
 float *initialise_table(FILE *file) {
   float *table = malloc(TABLE_SIZE * sizeof(table));
   if (table == NULL) {
