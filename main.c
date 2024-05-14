@@ -8,25 +8,25 @@ int main() {
   FILE *file;
   int i, j, k;
 
-  file = fopen("example.dat", "r");
+  file = fopen("op10_5.dat", "r");
   float *boxed_table = initialise_table(file);
   fclose(file);
 
   // test getting some of the table values after initialisation:
-  i = 0;
+  i = 4;
+  j = 6;
+  k = 5;
+    float *row = get_table_row(boxed_table, i, j, k);
+  printf("For energy index = %d in table %d\n", i, MAIN_DIM_F*k + j + 1);
+  printf("Energy[k] = %f, parameters: %f %f %f %f %f %f \n",
+         row[0], row[1], row[2], row[3], row[4], row[5], row[6]);
+  i = 6;
   j = 0;
   k = 0;
-  printf("For i = %d in table %d\n", i, MAIN_DIM_F*k + j + 1);
-  printf("Energy[k] = %f, Scattering cross-section: %f\n", 
-    *get_table_value(boxed_table, 0, i, j, k), 
-    *get_table_value(boxed_table, 1, i, j, k));
-  i = 6;
-  j = 1;
-  k = 2;
-  printf("For i = %d in table %d\n", i, MAIN_DIM_F*k + j + 1);
-  printf("Energy[k] = %f, Scattering cross-section: %f\n", 
-    *get_table_value(boxed_table, 0, i, j, k), 
-    *get_table_value(boxed_table, 1, i, j, k));
+  row = get_table_row(boxed_table, i, j, k);
+  printf("For energy index = %d in table %d\n", i, MAIN_DIM_F*k + j + 1);
+  printf("Energy[k] = %f, parameters: %f %f %f %f %f %f \n",
+         row[0], row[1], row[2], row[3], row[4], row[5], row[6]);
 
   free(boxed_table);
   return 0;
