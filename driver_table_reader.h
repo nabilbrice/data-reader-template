@@ -23,7 +23,6 @@ struct Table {
 };
 typedef struct Table Table;
 
-float *get_table_value(float *, int, int, int, int);
 float *get_table_row(Table *, int, int, int);
 
 void initialise_table_from_file(Table *, char *);

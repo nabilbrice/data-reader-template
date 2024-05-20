@@ -26,19 +26,6 @@ float *get_table_row(Table *table, int i, int j, int k) {
                       + table->stride_energy * i ]);
 }
 
-void save_into_array(float *array, float value, int index) {
-  array[index] = value;
-}
-
-void fload_subtable_header(char buff[], Table *table, int j, int k) {
-  float log_T, log_R;
-  // check the formatting first
-  if (sscanf(buff, "%*s %f %f", &log_T, &log_R)) {
-    table->log_Ts[k] = log_T;
-    table->log_Rs[j] = log_R;
-  };
-}
-
 // loads a 2D table into the memory specified by index j and k
 // from a file specified 
 void load_subtable(Table *table, FILE *file, int j, int k) {
@@ -51,7 +38,7 @@ void load_subtable(Table *table, FILE *file, int j, int k) {
     if (buff[0]=='#') {
       // some comment lines contain information about the table
       // this updates the array of log_Ts and log_Rs
-      fload_subtable_header(buff, table, j, k);
+      sscanf(buff, "%*s %f %f", &(table->log_Ts[k]), &(table->log_Rs[j]));
       continue;
     };
 
@@ -72,10 +59,12 @@ void initialise_table(Table *table, FILE *file) {
     printf("Error allocating for table data");
   };
 
+  // set stride lengths for the data array
   table->stride_energy = DIM_C;
   table->stride_log_Rs = DIM_R*DIM_C;
   table->stride_log_Ts = DIM_F*DIM_R*DIM_C;
 
+  // read in all the 2D subtables
   for (int k=0; (k < DIM_S); k++) {
     for (int j=0; (j < DIM_F); j++) {
       load_subtable(table, file, j, k);
