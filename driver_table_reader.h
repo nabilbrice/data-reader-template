@@ -1,8 +1,6 @@
 #ifndef DRIVER_TABLE_READER_H_
 #define DRIVER_TABLE_READER_H_
 
-#include <stdio.h>
-
 // currently the information about dimensions of the data
 // have to be given here:
 // giving the incorrect dimensions results in a garbled table
