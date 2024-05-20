@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 float *get_table_value(float *, int, int, int, int);
+float *get_table_row(float *, int, int, int);
 
 float *initialise_table(FILE *);
 
