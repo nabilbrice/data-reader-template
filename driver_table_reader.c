@@ -9,7 +9,7 @@ const int TABLE_SIZE = DIM_R * DIM_C * DIM_F * DIM_S;
 // j is index in R (log_R)
 // k is index in temp (log_T K)
 // Together these pointers will get to the correct index for energy, density and temp provided
-float *get_mut_table_value(Table *table, int p, int i, int j, int k) {
+double *get_mut_table_value(Table *table, int p, int i, int j, int k) {
   // returns a pointer to a value in the table
   // this can be used to write (mutate) the value stored in the table
   return &table->data[table->stride_energy * i 
@@ -18,7 +18,7 @@ float *get_mut_table_value(Table *table, int p, int i, int j, int k) {
                     + p];
 }
 
-float *get_table_row(Table *table, int i, int j, int k) {
+double *get_table_row(Table *table, int i, int j, int k) {
   // returns a pointer to the first value of the 7 numbers/parameters
   // to access each of the values, index in to this: row[p]
   return &(table->data[ table->stride_log_Ts * k 
@@ -38,12 +38,12 @@ void load_subtable(Table *table, FILE *file, int j, int k) {
     if (buff[0]=='#') {
       // some comment lines contain information about the table
       // this updates the array of log_Ts and log_Rs
-      sscanf(buff, "%*s %f %f", &(table->log_Ts[k]), &(table->log_Rs[j]));
+      sscanf(buff, "%*s %lf %lf", &(table->log_Ts[k]), &(table->log_Rs[j]));
       continue;
     };
 
-    float *row = get_table_row(table, i, j, k);
-    sscanf(buff, "%f %f %f %f %f %f %f", 
+    double *row = get_table_row(table, i, j, k);
+    sscanf(buff, "%lf %lf %lf %lf %lf %lf %lf", 
       &(table->energies[i]),  // energies are always the first entry
       &row[0], &row[1], &row[2], &row[3], &row[4], &row[5]);
     i++;
@@ -54,7 +54,7 @@ void load_subtable(Table *table, FILE *file, int j, int k) {
 // requires manually calling free when done with the table
 void initialise_table(Table *table, FILE *file) {
   // allocate the space required for the data
-  table->data = malloc(TABLE_SIZE * sizeof(float));
+  table->data = malloc(TABLE_SIZE * sizeof(table->data));
   if (table->data == NULL) {
     printf("Error allocating for table data");
   };
