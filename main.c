@@ -26,6 +26,9 @@ int main() {
   printf("Energy[k] = %f, parameters: %4.3e %4.3e %4.3e %4.3e %4.3e %4.3e \n",
          boxed_table.energies[i], row[0], row[1], row[2], row[3], row[4], row[5]);
 
+    int index = closest_indices(boxed_table.log_Ts, DIM_S, 4.910);
+    printf("Closest index temp: %d \n", index);
+    
   free_table(&boxed_table);
   return 0;
 

@@ -81,3 +81,24 @@ void initialise_table_from_file(Table *table, char *filename) {
 void free_table(Table *table) {
   free(table->data);
 }
+
+// Convert from density to R
+// Value for input needs to be log10
+double log_density_to_R(double logdensity, double logtemp) {
+    return logdensity - 3 * (logtemp - 6);
+}
+
+// Function to return the index for the larger element of an ordered array above the input value
+// Inputs: array (ordered), length, value; Return: larger element index
+int closest_indices(double *array, int length, double value) {
+    for (int idx = 0; idx < length; idx++) {
+        if (array[idx] >= value){
+            return idx;
+        };
+    };
+    return -1;
+}
+// If return is 0 or -1, value is out of bounds
+
+
+

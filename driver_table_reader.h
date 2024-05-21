@@ -27,4 +27,6 @@ void initialise_table_from_file(Table *, char *);
 
 void free_table(Table *);
 
+int closest_indices(double *, int, double);
+
 #endif // DRIVER_TABLE_READER_H_
