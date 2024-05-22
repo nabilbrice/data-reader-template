@@ -62,14 +62,10 @@ void load_tables(TableCollection *collection, FILE *file) {
     };
 
     TableRow *row = get_table_row(collection, i, logT, logR);
+    double *entry = row->entry;
     sscanf(buff, "%lf %lf %lf %lf %lf %lf %lf", 
       &(collection->row_labels[i]),  // row label is the first entry
-      &row->entry[0], 
-      &row->entry[1], 
-      &row->entry[2], 
-      &row->entry[3], 
-      &row->entry[4], 
-      &row->entry[5]);
+      &entry[0], &entry[1], &entry[2], &entry[3], &entry[4], &entry[5]);
     i++;
   };
 }
