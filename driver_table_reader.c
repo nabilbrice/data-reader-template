@@ -3,9 +3,12 @@
 #include <stdlib.h>
 #include "driver_table_reader.h"
 
-// returns the index of the table in the collection
-// should automatically give the floor index
-// information about the logT and logR arrays is stored here
+// dimensions (number of) labels in logR
+#define DIM_FAST 56
+// dimensions (number of) labels in logT
+#define DIM_SLOW 22
+// returns the floor index of the table in the collection
+// assumes a particular distribution of labels in logT and logR
 int hash_label(double logT, double logR) {
   int index_j, index_k;
   index_j = (logR + 7.4) / 0.2;  
@@ -43,15 +46,15 @@ TableRow *get_table_row_from_key(TableCollection *collection, int i,
 // loads a 2D table into the memory specified by index j and k
 // from a file specified 
 void load_tables(TableCollection *collection, FILE *file) {
-  char buff[1024];
+  char buff[256];
 
   int i = 0;
   double logT, logR;
-  // condition to capture end of file and end of table
+  // keeps reading rows in the file until reaching end of file (EOF)
   while (fgets(buff, sizeof(buff), file)) {
     // check if the line starts with the comment line char
     if (buff[0]=='#') {
-      i = 0; // reset the energies index to 0
+      i = 0; // reset the row_label index since new table
       // some comment lines contain information about the table
       // this updates the array of log_Ts and log_Rs
       sscanf(buff, "%*s %lf %lf", &(logT), &(logR));
@@ -69,7 +72,6 @@ void load_tables(TableCollection *collection, FILE *file) {
       &row->entry[5]);
     i++;
   };
-  // printf("finished loading table %d\n", DIM_F * k + j + 1);
 }
 
 // requires manually calling free when done with the table

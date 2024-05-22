@@ -6,8 +6,6 @@
 // giving the incorrect dimensions results in a garbled table
 #define DIM_ROWS 301
 #define DIM_COLS 6
-#define DIM_FAST 56
-#define DIM_SLOW 22
 // a row of data values
 // with known compile-time size
 typedef struct TableRow {

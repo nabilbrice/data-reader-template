@@ -13,7 +13,6 @@ int main() {
   j = 6;
   k = 5;
   TableRow *row = get_table_row(&collection, i, j, k);
-  printf("For energy index = %d in table %d\n", i, DIM_FAST*k + j + 1);
   printf("Energy[k] = %f, parameters: %4.3e %4.3e %4.3e %4.3e %4.3e %4.3e \n",
         collection.row_labels[i],
         row->entry[0], 
