@@ -4,27 +4,33 @@
 // currently the information about dimensions of the data
 // have to be given here:
 // giving the incorrect dimensions results in a garbled table
-#define DIM_R 301
-#define DIM_C 6
-#define DIM_F 56
-#define DIM_S 22
-// a data structure to hold the table information,
+#define DIM_ROWS 301
+#define DIM_COLS 6
+#define DIM_FAST 56
+#define DIM_SLOW 22
+// a row of data values
+// with known compile-time size
+typedef struct TableRow {
+  double entry[DIM_COLS];
+} TableRow;
+// 2D subtable with known compile-time size
+typedef struct SizedTable {
+  TableRow row[DIM_ROWS];
+} SizedTable;
+// a data structure to hold all the tables,
 // including the values of the headers
-struct Table {
-  double *data;
-  int stride_energy;
-  int stride_log_Rs;
-  int stride_log_Ts;
-  double energies[DIM_R];
-  double log_Ts[DIM_S];
-  double log_Rs[DIM_F];
-};
-typedef struct Table Table;
+// dynamically allocated at run-time
+typedef struct TableCollection {
+  double row_labels[DIM_ROWS];
+  SizedTable *table;
+  double log_Ts[DIM_SLOW];
+  double log_Rs[DIM_FAST];
+} TableCollection;
 
-double *get_table_row(Table *, int, int, int);
+TableRow *get_table_row(TableCollection *, int, int, int);
 
-void initialise_table_from_file(Table *, char *);
+void initialise_tables_from_file(TableCollection *, char *);
 
-void free_table(Table *);
+void drop_tables(TableCollection *);
 
 #endif // DRIVER_TABLE_READER_H_
