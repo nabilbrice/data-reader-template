@@ -12,7 +12,7 @@ int main() {
   i = 4;
   j = 6;
   k = 5;
-  TableRow *row = get_table_row(&collection, i, j, k);
+  TableRow *row = get_table_row_from_index(&collection, i, j, k);
   printf("Energy[k] = %f, parameters: %4.3e %4.3e %4.3e %4.3e %4.3e %4.3e \n",
         collection.row_labels[i],
         row->entry[0], 
@@ -24,7 +24,7 @@ int main() {
   i = 4;
   double logT = 5.48;
   double logR = -6.10;
-  row = get_table_row_from_key(&collection, i, logT, logR);
+  row = get_table_row(&collection, i, logT, logR);
   printf("For energy index = %d in table index: %d\n", i, hash_label(logT, logR));
   printf("log_T: %f and log_R: %f\n", logT, logR);
   printf("Energy[k] = %f, parameters: %4.3e %4.3e %4.3e %4.3e %4.3e %4.3e \n",
