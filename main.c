@@ -15,7 +15,7 @@ int main() {
   TableRow *row = get_table_row(&collection, i, j, k);
   printf("For energy index = %d in table %d\n", i, DIM_FAST*k + j + 1);
   printf("log_T: %f and log_R: %f\n", collection.log_Ts[k], collection.log_Rs[j]);
-  printf("Energy[k] = %f, parameters: %f %f %f %f %f %f \n",
+  printf("Energy[k] = %f, parameters: %4.3e %4.3e %4.3e %4.3e %4.3e %4.3e \n",
         collection.row_labels[i],
         row->entry[0], 
         row->entry[1], 
@@ -23,12 +23,14 @@ int main() {
         row->entry[3],
         row->entry[4],
         row->entry[5]);
-  i = 6;
-  j = 0;
-  k = 0;
-  row = get_table_row_from_key(&collection, i, 4.91, -7.48);
-  printf("For energy index = %d in table %d\n", i, DIM_FAST*k + j + 1);
-  printf("log_T: %f and log_R: %f\n", collection.log_Ts[k], collection.log_Rs[j]);
+  i = 4;
+  j = 6;
+  k = 5;
+  double logT = 5.48;
+  double logR = -6.10;
+  row = get_table_row_from_key(&collection, i, logT, logR);
+  printf("For energy index = %d in table index: %d\n", i, hash_label(logT, logR));
+  printf("log_T: %f and log_R: %f\n", logT, logR);
   printf("Energy[k] = %f, parameters: %4.3e %4.3e %4.3e %4.3e %4.3e %4.3e \n",
          collection.row_labels[i], 
           row->entry[0], 

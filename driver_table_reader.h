@@ -27,6 +27,8 @@ typedef struct TableCollection {
   double log_Rs[DIM_FAST];
 } TableCollection;
 
+int hash_label(double, double);
+
 TableRow *get_table_row_from_key(TableCollection *, int, double, double);
 
 TableRow *get_table_row(TableCollection *, int, int, int);
