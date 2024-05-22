@@ -3,16 +3,29 @@
 #include <stdlib.h>
 #include "driver_table_reader.h"
 
+// size of char buffer for reading in lines
+#define BUFFSIZE 256
+//
+// compile-time information to configure the hashing function
+//
+// logR labels look like:
+// [-7.4, -7.2, -7.0, ...]
+#define LOGR0 (-7.4)
+#define LOGR_STEP 0.2
 // dimensions (number of) labels in logR
 #define DIM_FAST 56
+// logT labels look like:
+// [4.9, 5.0, 5.1, ...]
+#define LOGT0 (4.9)
+#define LOGT_STEP 0.1
 // dimensions (number of) labels in logT
 #define DIM_SLOW 22
+
 // returns the floor index of the table in the collection
 // assumes a particular distribution of labels in logT and logR
 int hash_label(double logT, double logR) {
-  int index_j, index_k;
-  index_j = (logR + 7.4) / 0.2;  
-  index_k = (logT - 4.9) / 0.1;
+  int index_j = (logR - LOGR0) / LOGR_STEP;  
+  int index_k = (logT - LOGT0) / LOGT_STEP;
   return index_k * DIM_FAST + index_j;
 }
 
@@ -46,7 +59,7 @@ TableRow *get_table_row(TableCollection *collection, int i,
 // loads a 2D table into the memory specified by index j and k
 // from a file specified 
 void load_tables(TableCollection *collection, FILE *file) {
-  char buff[256];
+  char buff[BUFFSIZE];
 
   int i = 0;
   double logT, logR;
@@ -55,8 +68,7 @@ void load_tables(TableCollection *collection, FILE *file) {
     // check if the line starts with the comment line char
     if (buff[0]=='#') {
       i = 0; // reset the row_label index since new table
-      // some comment lines contain information about the table
-      // this updates the array of log_Ts and log_Rs
+      // some comment lines contain table labels
       sscanf(buff, "%*s %lf %lf", &(logT), &(logR));
       continue;
     };
