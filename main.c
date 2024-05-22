@@ -14,7 +14,6 @@ int main() {
   k = 5;
   TableRow *row = get_table_row(&collection, i, j, k);
   printf("For energy index = %d in table %d\n", i, DIM_FAST*k + j + 1);
-  printf("log_T: %f and log_R: %f\n", collection.log_Ts[k], collection.log_Rs[j]);
   printf("Energy[k] = %f, parameters: %4.3e %4.3e %4.3e %4.3e %4.3e %4.3e \n",
         collection.row_labels[i],
         row->entry[0], 
@@ -24,8 +23,6 @@ int main() {
         row->entry[4],
         row->entry[5]);
   i = 4;
-  j = 6;
-  k = 5;
   double logT = 5.48;
   double logR = -6.10;
   row = get_table_row_from_key(&collection, i, logT, logR);

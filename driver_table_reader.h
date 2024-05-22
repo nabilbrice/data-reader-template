@@ -23,8 +23,6 @@ typedef struct SizedTable {
 typedef struct TableCollection {
   double row_labels[DIM_ROWS];
   SizedTable *table;
-  double log_Ts[DIM_SLOW];
-  double log_Rs[DIM_FAST];
 } TableCollection;
 
 int hash_label(double, double);
