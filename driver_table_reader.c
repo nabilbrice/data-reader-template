@@ -101,4 +101,11 @@ int closest_indices(double *array, int length, double value) {
 // If return is 0 or -1, value is out of bounds
 
 
+// Function to interpolate
+// Inputs: data table, value for temp, density and energy
+// Outputs: Row of 6 interpolated values
+// How do I return these values
+//double *interpolated_table_row(Table *table, double temp_value, double density_value, double energy_value) {
+    
+//}
 
