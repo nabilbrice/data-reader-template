@@ -3,81 +3,104 @@
 #include <stdlib.h>
 #include "driver_table_reader.h"
 
-const int TABLE_SIZE = DIM_R * DIM_C * DIM_F * DIM_S;
-// p is index for parameter (i.e. 0 = energy, 1 = sigma +, 2 = sigma -, etc
+// size of char buffer for reading in lines
+#define BUFFSIZE 256
+//
+// compile-time information to configure the hashing function
+//
+// logR labels look like:
+// [-7.4, -7.2, -7.0, ...]
+#define LOGR0 (-7.4)
+#define LOGR_STEP 0.2
+// dimensions (number of) labels in logR
+#define DIM_FAST 56
+// logT labels look like:
+// [4.9, 5.0, 5.1, ...]
+#define LOGT0 (4.9)
+#define LOGT_STEP 0.1
+// dimensions (number of) labels in logT
+#define DIM_SLOW 22
+
+// returns the floor index of the table in the collection
+// assumes a particular distribution of labels in logT and logR
+int hash_label(double logT, double logR) {
+  int index_j = (logR - LOGR0) / LOGR_STEP;  
+  int index_k = (logT - LOGT0) / LOGT_STEP;
+  return index_k * DIM_FAST + index_j;
+}
+
+// returns a pointer to a table in the collection
+// j is index in R (log_R)
+// k is index in temp (log_T K)
+SizedTable *get_table_from_index(TableCollection *collection, int j, int k) {
+  return &(collection->table[DIM_FAST * k + j]);
+}
+
+SizedTable *get_table(TableCollection *collection, double logT, double logR) {
+  int table_index = hash_label(logT, logR);
+  return &(collection->table[table_index]);
+}
+
+// returns a pointer to the row in a table collection
 // i is index in energy (log_E eV)
 // j is index in R (log_R)
 // k is index in temp (log_T K)
-// Together these pointers will get to the correct index for energy, density and temp provided
-double *get_mut_table_value(Table *table, int p, int i, int j, int k) {
-  // returns a pointer to a value in the table
-  // this can be used to write (mutate) the value stored in the table
-  return &table->data[table->stride_energy * i 
-                    + table->stride_log_Rs * j 
-                    + table->stride_log_Ts * k 
-                    + p];
+TableRow *get_table_row_from_index(TableCollection *collection, int i, int j, int k) {
+  SizedTable *table = get_table_from_index(collection, j, k);
+  return &(table->row[i]);
 }
 
-double *get_table_row(Table *table, int i, int j, int k) {
-  // returns a pointer to the first value of the 7 numbers/parameters
-  // to access each of the values, index in to this: row[p]
-  return &(table->data[ table->stride_log_Ts * k 
-                      + table->stride_log_Rs * j 
-                      + table->stride_energy * i ]);
+TableRow *get_table_row(TableCollection *collection, int i, 
+                                 double logT, double logR) {
+  SizedTable *table = get_table(collection, logT, logR);
+  return &(table->row[i]);
 }
 
 // loads a 2D table into the memory specified by index j and k
 // from a file specified 
-void load_subtable(Table *table, FILE *file, int j, int k) {
-  char buff[1024];
+void load_tables(TableCollection *collection, FILE *file) {
+  char buff[BUFFSIZE];
 
   int i = 0;
-  // condition to capture end of file and end of table
-  while (fgets(buff, sizeof(buff), file)&&(i<DIM_R)) {
+  double logT, logR;
+  // keeps reading rows in the file until reaching end of file (EOF)
+  while (fgets(buff, sizeof(buff), file)) {
     // check if the line starts with the comment line char
     if (buff[0]=='#') {
-      // some comment lines contain information about the table
-      // this updates the array of log_Ts and log_Rs
-      sscanf(buff, "%*s %lf %lf", &(table->log_Ts[k]), &(table->log_Rs[j]));
+      i = 0; // reset the row_label index since new table
+      // some comment lines contain table labels
+      sscanf(buff, "%*s %lf %lf", &(logT), &(logR));
       continue;
     };
 
-    double *row = get_table_row(table, i, j, k);
+    TableRow *row = get_table_row(collection, i, logT, logR);
+    double *entry = row->entry;
     sscanf(buff, "%lf %lf %lf %lf %lf %lf %lf", 
-      &(table->energies[i]),  // energies are always the first entry
-      &row[0], &row[1], &row[2], &row[3], &row[4], &row[5]);
+      &(collection->row_labels[i]),  // row label is the first entry
+      &entry[0], &entry[1], &entry[2], &entry[3], &entry[4], &entry[5]);
     i++;
   };
-  // printf("finished loading table %d\n", DIM_F * k + j + 1);
 }
 
 // requires manually calling free when done with the table
-void initialise_table(Table *table, FILE *file) {
+void initialise_table(TableCollection *collection, FILE *file) {
   // allocate the space required for the data
-  table->data = malloc(TABLE_SIZE * sizeof(table->data));
-  if (table->data == NULL) {
+  int number_of_tables = DIM_FAST * DIM_SLOW;
+  collection->table = malloc(number_of_tables * sizeof(SizedTable));
+  if (collection->table == NULL) {
     printf("Error allocating for table data");
   };
-
-  // set stride lengths for the data array
-  table->stride_energy = DIM_C;
-  table->stride_log_Rs = DIM_R*DIM_C;
-  table->stride_log_Ts = DIM_F*DIM_R*DIM_C;
-
   // read in all the 2D subtables
-  for (int k=0; (k < DIM_S); k++) {
-    for (int j=0; (j < DIM_F); j++) {
-      load_subtable(table, file, j, k);
-    };
-  };
+  load_tables(collection, file);
 }
 
-void initialise_table_from_file(Table *table, char *filename) {
+void initialise_tables_from_file(TableCollection *collection, char *filename) {
   FILE *file = fopen(filename, "r");
-  initialise_table(table, file);
+  initialise_table(collection, file);
   fclose(file);
 }
 
-void free_table(Table *table) {
-  free(table->data);
+void drop_tables(TableCollection *collection) {
+  free(collection->table);
 }
+
