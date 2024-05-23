@@ -1,6 +1,6 @@
 .PHONY: clean, test, test-run
 
-CC ?= gcc
+CC ?= clang
 CFLAGS := -Wextra -Wall -Wconversion -Wcast-align -Wstrict-prototypes
 
 clean:
