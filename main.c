@@ -29,6 +29,14 @@ int main() {
     int index = closest_indices(boxed_table.log_Ts, DIM_S, 4.910);
     printf("Closest index temp: %d \n", index);
     
+    double omega_plus = interpolated_value(&boxed_table, 5.39, -8, 1.04, 0);
+    double omega_minus = interpolated_value(&boxed_table, 5.39, -8, 1.04, 1);
+    double omega_zero = interpolated_value(&boxed_table, 5.39, -8, 1.04, 2);
+    double sigma_plus = interpolated_value(&boxed_table, 5.39, -8, 1.04, 3);
+    double sigma_minus = interpolated_value(&boxed_table, 5.39, -8, 1.04, 4);
+    double sigma_zero = interpolated_value(&boxed_table, 5.39, -8, 1.04, 5);
+    printf("Interpolated values = %lf, %lf, %lf, %4.3e, %4.3e, %4.3e \n", omega_plus, omega_minus, omega_zero, sigma_plus, sigma_minus, sigma_zero);
+    
   free_table(&boxed_table);
   return 0;
 

@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "driver_table_reader.h"
 
 const int TABLE_SIZE = DIM_R * DIM_C * DIM_F * DIM_S;
@@ -102,10 +103,43 @@ int closest_indices(double *array, int length, double value) {
 
 
 // Function to interpolate
-// Inputs: data table, value for temp, density and energy
-// Outputs: Row of 6 interpolated values
+// Inputs: data table, value for temp, density and energy, index of variable
+// Outputs: One interpolated value for one variable
 // How do I return these values
-//double *interpolated_table_row(Table *table, double temp_value, double density_value, double energy_value) {
+double interpolated_value(Table *boxed_table, double temp_value, double density_value, double energy_value, int variable_index) {
     
-//}
+    double R_value = log_density_to_R(density_value, temp_value);
+    
+    int energy_index = closest_indices(boxed_table->energies, DIM_R, energy_value);
+    
+    int closest_index_temp = closest_indices(boxed_table->log_Ts, DIM_S, temp_value);
+    int second_closest_temp = closest_index_temp - 1;
+    int closest_index_R = closest_indices(boxed_table->log_Rs, DIM_F, R_value);
+    int second_closest_R = closest_index_R - 1;
+    
+    if ((closest_index_temp >= 1) && (closest_index_R >= 1)){
+        if (energy_value == boxed_table->energies[energy_index]){
+            double temp_weight = fabs(temp_value - boxed_table->log_Ts[closest_index_temp])/(0.1);
+            double R_weight = fabs(R_value - boxed_table->log_Rs[closest_index_R])/(0.2);
+            
+            double value1 = get_table_row(boxed_table, energy_index, closest_index_R, closest_index_temp)[variable_index];
+            double value2 = get_table_row(boxed_table, energy_index, second_closest_R, closest_index_temp)[variable_index];
+            double value3 = get_table_row(boxed_table, energy_index, closest_index_R, second_closest_temp)[variable_index];
+            double value4 = get_table_row(boxed_table, energy_index, second_closest_R, second_closest_temp)[variable_index];
+            //printf("temp_weight = %lf", temp_weight);
+            
+            double interpolated_value = (value1 * (1-temp_weight) * (1-R_weight)) + (value2 * (1-temp_weight) * (R_weight)) + (value3 * (temp_weight) * (1-R_weight)) + (value4 * (temp_weight) * (R_weight));
+            
+            
+            return interpolated_value;
+        }
+        else{
+            printf("Error: Incoreect energy value");
+        }
+    }
+    else {
+        printf("Error: Out of bounds value");
+    }
+    return 0;
+}
 

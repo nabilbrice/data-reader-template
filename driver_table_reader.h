@@ -29,4 +29,6 @@ void free_table(Table *);
 
 int closest_indices(double *, int, double);
 
+double interpolated_value(Table *, double, double, double, int);
+
 #endif // DRIVER_TABLE_READER_H_
